@@ -2,85 +2,93 @@
 Account testing module
 '''
 
-import unittest
+import pytest
 from account import Account
 
-class TestAccount(unittest.TestCase):
+class Test:
     '''
-    Tests
+    Test class
     '''
 
-    delta = 0.000001
+    # Setup and teardown
 
-    def setUp(self):
+    def setup_method(self):
         '''
         Create our test Account objects
         '''
-        self.account_1 = Account('Foo')
-        self.account_2 = Account('Bar')
+        self.a_1 = Account('Foo')
+        self.a_2 = Account('Bar')
+
+    def teardown_method(self):
+        '''
+        Delete our test Account objects
+        '''
+        del self.a_1
+        del self.a_2
+
+    # Tests
 
     def test_init(self):
         '''
         Tests account initalization.
         Accounts should have a name and balance of 0.
         '''
-        self.assertEqual(self.account_1.get_name(), 'Foo')
-        self.assertEqual(self.account_1.get_balance(), 0)
+        assert self.a_1.get_name() == 'Foo'
+        assert self.a_1.get_balance() == 0
 
-        self.assertEqual(self.account_2.get_name(), 'Bar')
-        self.assertEqual(self.account_2.get_balance(), 0)
+        assert self.a_2.get_name() == 'Bar'
+        assert self.a_2.get_balance() == 0
 
     def test_deposit(self):
         '''
         Test deposits
         '''
         # Basic functionality
-        self.assertEqual(self.account_1.get_balance(), 0)
-        self.assertTrue(self.account_1.deposit(5))
-        self.assertEqual(self.account_1.get_balance(), 5)
-        self.assertTrue(self.account_1.deposit(10.0))
-        self.assertAlmostEqual(self.account_1.get_balance(), 15.0, delta=self.delta)
+        assert self.a_1.get_balance() == 0
+        assert self.a_1.deposit(5) is True
+        assert self.a_1.get_balance() == 5
+        assert self.a_1.deposit(10.0) is True
+        assert self.a_1.get_balance() == pytest.approx(15.0, abs=0.001)
 
         # Ensure accounts aren't at all connected.
-        self.assertEqual(self.account_2.get_balance(), 0)
-        self.assertTrue(self.account_1.deposit(10))
-        self.assertEqual(self.account_2.get_balance(), 0)
+        assert self.a_2.get_balance() == 0
+        assert self.a_1.deposit(10) is True
+        assert self.a_2.get_balance() == 0
 
         # Return false if negative, 0
-        self.assertFalse(self.account_1.deposit(-1))
-        self.assertFalse(self.account_1.deposit(0))
+        assert self.a_1.deposit(-1) is False
+        assert self.a_1.deposit(0) is False
 
         # Check incompatible type
-        self.assertRaises(TypeError, self.account_1.deposit, 'Zero')
+        with pytest.raises(TypeError):
+            self.a_1.deposit('Zero')
 
     def test_withdraw(self):
         '''
         Test withdrawals
         '''
         # Basic functionality
-        self.assertEqual(self.account_1.get_balance(), 0)
-        self.assertTrue(self.account_1.deposit(5))
-        self.assertEqual(self.account_1.get_balance(), 5)
-        self.assertTrue(self.account_1.withdraw(5))
-        self.assertEqual(self.account_1.get_balance(), 0)
+        assert self.a_1.get_balance() == 0
+        assert self.a_1.deposit(5) is True
+        assert self.a_1.get_balance() == 5
+        assert self.a_1.withdraw(5) is True
+        assert self.a_1.get_balance() == 0
 
-        self.assertTrue(self.account_1.deposit(10.0))
-        self.assertTrue(self.account_1.withdraw(5))
-        self.assertAlmostEqual(self.account_1.get_balance(), 5.0, delta=self.delta)
+        assert self.a_1.deposit(10.0) is True
+        assert self.a_1.withdraw(5) is True
+        assert self.a_1.get_balance() == pytest.approx(5.0, abs=0.001)
 
         # Ensure accounts aren't at all connected.
-        self.assertEqual(self.account_2.get_balance(), 0)
-        self.assertTrue(self.account_1.deposit(10))
-        self.assertTrue(self.account_1.withdraw(5))
-        self.assertEqual(self.account_2.get_balance(), 0)
+        assert self.a_2.get_balance() == 0
+        assert self.a_1.deposit(10) is True
+        assert self.a_1.withdraw(5) is True
+        assert self.a_2.get_balance() == 0
 
         # Return false if negative, 0, greater than account balance
-        self.assertFalse(self.account_2.withdraw(-1))
-        self.assertFalse(self.account_2.withdraw(0))
-        self.assertFalse(self.account_2.withdraw(1))
+        assert self.a_2.withdraw(-1) is False
+        assert self.a_2.withdraw(0) is False
+        assert self.a_2.withdraw(1) is False
 
         # Check incompatible type
-        self.assertRaises(TypeError, self.account_1.withdraw, 'Zero')
-
-if __name__ == "__main__":
-    unittest.main()
+        with pytest.raises(TypeError):
+            self.a_1.withdraw('Zero')

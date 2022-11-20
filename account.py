@@ -19,6 +19,7 @@ class Account:
         '''
         Adds money to account
         :param amount: The amount of money to deposit
+        :return: Boolean indicating if transaction was successful
         '''
         # Cannot deposit 0 or negative amount
         if amount <= 0:
@@ -31,6 +32,7 @@ class Account:
         '''
         Withdraws money from account
         :param amount: The amount of money to withdraw
+        :return: Boolean indicating if transaction was successful
         '''
         # Cannot withdraw 0, negative amount, or more than is held.
         if amount <= 0 or amount > self.__account_balance:
@@ -42,11 +44,13 @@ class Account:
     def get_balance(self) -> float:
         '''
         Returns account balance
+        :return: Returns current account balance
         '''
         return self.__account_balance
 
     def get_name(self) -> str:
         '''
         Returns account name
+        :return: Returns account name
         '''
         return self.__account_name
